@@ -35,7 +35,7 @@ Everyday Wallpaper is a Windows application that automatically downloads and set
 
 1. Run the application.
 2. Right-click the tray icon to see the current wallpaper and exit option.
-3. The application will update the wallpaper automatically every 30 minutes.
+3. The application will update the wallpaper automatically everyday.
 
 ## Code Overview
 
