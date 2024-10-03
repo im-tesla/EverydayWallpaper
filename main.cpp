@@ -98,7 +98,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     createContextMenu();
     createTrayIcon(hwnd);
 
-	std::thread t(detachedThread);
+    std::thread t(detachedThread);
     t.detach();
 
     MSG msg;
