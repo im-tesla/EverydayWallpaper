@@ -32,3 +32,6 @@
 *.app
 
 .vs/
+Everyday.*/
+Everyday.*
+x64/
