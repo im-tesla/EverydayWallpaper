@@ -25,7 +25,7 @@ void createTrayIcon(HWND hwnd) {
     nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     nid.uCallbackMessage = WM_TRAYICON;
     nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    lstrcpy(nid.szTip, TEXT("Tray Icon Example"));
+    lstrcpy(nid.szTip, TEXT("Everyday Wallpaper"));
 
     Shell_NotifyIcon(NIM_ADD, &nid);
 }
