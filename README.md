@@ -8,7 +8,7 @@ Everyday Wallpaper is a Windows application that automatically downloads and set
 
 ## Features
 
-- **Automatic Wallpaper Updates**: Downloads and sets Bing's daily wallpaper every 30 minutes.
+- **Automatic Wallpaper Updates**: Downloads and sets Bing's daily wallpaper everyday.
 - **System Tray Integration**: Minimalistic interface with a tray icon.
 - **Context Menu**: Access a context menu by right-clicking the tray icon.
 
