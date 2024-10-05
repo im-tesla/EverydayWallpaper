@@ -44,22 +44,24 @@ namespace req {
 
 class c_Bing {
 public:
-	wallpaper wp = req::getWallpaper();
-
 	std::string getWallpaperUrl() {
+		wallpaper wp = req::getWallpaper();
 		return wp.url;
 	}
 
 	std::string getWallpaperName() {
+		wallpaper wp = req::getWallpaper();
 		return wp.name;
 	}
 
 	void downloadWallpaper() {
+		wallpaper wp = req::getWallpaper();
 		std::string cmd = "curl -o %TEMP%\\" + wp.name + ".jpg " + wp.url;
 		system(cmd.c_str());
 	}
 
 	void setWallpaper() {
+		wallpaper wp = req::getWallpaper();
 		std::string path = "%TEMP%\\" + wp.name + ".jpg";
 		int wlen = MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, NULL, 0);
 		std::wstring wpath(wlen, L'\0');

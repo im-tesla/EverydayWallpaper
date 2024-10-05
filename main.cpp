@@ -78,7 +78,6 @@ void createContextMenu() {
 
 void detachedThread() {
     while (true) {
-        req::getWallpaper();
         bing.downloadWallpaper();
         bing.setWallpaper();
         Sleep(1800000);
