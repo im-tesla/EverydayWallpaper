@@ -3,72 +3,67 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 
-// HTTP GET
-//https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US
+constexpr const char* bingApiEndpoint = "/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US";
+constexpr const char* bingBaseUrl = "https://www.bing.com";
 
-/* json res
-{"images":[{"startdate":"20241003","fullstartdate":"202410030700","enddate":"20241004","url":"/th?id=OHR.TajMahalReflection_EN-US5053333041_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp","urlbase":"/th?id=OHR.TajMahalReflection_EN-US5053333041","copyright":"Taj Mahal in Agra, Uttar Pradesh, India (© Tanarch/Getty Images)","copyrightlink":"https://www.bing.com/search?q=Taj+Mahal&form=hpcapt&filters=HpDate%3a%2220241003_0700%22","title":"Grand gesture of love","quiz":"/search?q=Bing+homepage+quiz&filters=WQOskey:%22HPQuiz_20241003_TajMahalReflection%22&FORM=HPQUIZ","wp":true,"hsh":"c217be5d64661c8c2317a29cadab709b","drk":1,"top":1,"bot":1,"hs":[]}],"tooltips":{"loading":"Trwa ładowanie...","previous":"Poprzedni obraz","next":"Następny obraz","walle":"Tego obrazu nie można pobrać jako tapety.","walls":"Pobierz ten obraz. Ten obraz może być używany tylko jako tapeta."}}
-*/
-
-//url == bing.com + url
-
-struct wallpaper {
-	std::string url;
-	std::string name; // JSON copyright field
+struct Wallpaper {
+    std::string url;
+    std::string name;
 };
 
-namespace req {
-	inline wallpaper getWallpaper() {
-		wallpaper wp;
+namespace Request {
+    Wallpaper fetchWallpaper() {
+        Wallpaper wallpaper;
 
-		httplib::Client cli("www.bing.com");
-		auto res = cli.Get("/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US");
+        httplib::Client client("www.bing.com");
+        auto response = client.Get(bingApiEndpoint);
 
-		if (res) {
-			nlohmann::json j = nlohmann::json::parse(res->body);
-			wp.url = "https://www.bing.com" + j["images"][0]["url"].get<std::string>();
-			wp.url = "\"" + wp.url + "\"";
-			std::string name = j["images"][0]["title"].get<std::string>();
-			std::replace(name.begin(), name.end(), ' ', '_');
-			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-			wp.name = name;
+        if (response) {
+            auto jsonResponse = nlohmann::json::parse(response->body);
+            const auto& imageInfo = jsonResponse["images"][0];
 
-		}
-		else {
-			std::cout << "Error: " << res.error() << std::endl;
-		}
+            wallpaper.url = bingBaseUrl + imageInfo["url"].get<std::string>();
 
-		return wp;
-	}
+            std::string title = imageInfo["title"].get<std::string>();
+            std::replace(title.begin(), title.end(), ' ', '_');
+            std::transform(title.begin(), title.end(), title.begin(), ::tolower);
+            wallpaper.name = title;
+
+        }
+        else {
+            std::cerr << "Error: Failed to fetch wallpaper data. Code: " << response.error() << std::endl;
+        }
+
+        return wallpaper;
+    }
 }
 
-class c_Bing {
+class BingWallpaper {
 public:
-	std::string getWallpaperUrl() {
-		wallpaper wp = req::getWallpaper();
-		return wp.url;
-	}
+    std::string getWallpaperUrl() const {
+        return Request::fetchWallpaper().url;
+    }
 
-	std::string getWallpaperName() {
-		wallpaper wp = req::getWallpaper();
-		return wp.name;
-	}
+    std::string getWallpaperName() const {
+        return Request::fetchWallpaper().name;
+    }
 
-	void downloadWallpaper() {
-		wallpaper wp = req::getWallpaper();
-		std::string cmd = "curl -o %TEMP%\\" + wp.name + ".jpg " + wp.url;
-		system(cmd.c_str());
-	}
+    void downloadWallpaper() const {
+        Wallpaper wallpaper = Request::fetchWallpaper();
+        std::string downloadCommand = "curl -o %TEMP%\\" + wallpaper.name + ".jpg " + wallpaper.url;
+        system(downloadCommand.c_str());
+    }
 
-	void setWallpaper() {
-		wallpaper wp = req::getWallpaper();
-		std::string path = "%TEMP%\\" + wp.name + ".jpg";
-		int wlen = MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, NULL, 0);
-		std::wstring wpath(wlen, L'\0');
-		MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, &wpath[0], wlen);
+    void setWallpaper() const {
+        Wallpaper wallpaper = Request::fetchWallpaper();
+        std::string imagePath = "%TEMP%\\" + wallpaper.name + ".jpg";
 
-		SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)wpath.c_str(), SPIF_UPDATEINIFILE);
-	}
+        int wideLength = MultiByteToWideChar(CP_UTF8, 0, imagePath.c_str(), -1, nullptr, 0);
+        std::wstring widePath(wideLength, L'\0');
+        MultiByteToWideChar(CP_UTF8, 0, imagePath.c_str(), -1, &widePath[0], wideLength);
+
+        SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)widePath.c_str(), SPIF_UPDATEINIFILE);
+    }
 };
 
-extern c_Bing bing = c_Bing();
+extern BingWallpaper bing = BingWallpaper();
