@@ -44,14 +44,52 @@ public:
         return Request::fetchWallpaper().url;
     }
 
+    static std::string prettifyName(const std::string& raw) {
+        std::string result;
+        bool capitalize = true;
+
+        for (char c : raw) {
+            if (c == '_') {
+                result.push_back(' ');
+                capitalize = true;
+            }
+            else {
+                if (capitalize && std::isalpha(static_cast<unsigned char>(c))) {
+                    result.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
+                    capitalize = false;
+                }
+                else {
+                    result.push_back(c);
+                }
+            }
+        }
+
+        return result;
+    }
+
     std::string getWallpaperName() const {
-        return Request::fetchWallpaper().name;
+        std::string raw = Request::fetchWallpaper().name;
+        return prettifyName(raw);
     }
 
     void downloadWallpaper() const {
         Wallpaper wallpaper = Request::fetchWallpaper();
-        std::string downloadCommand = "curl -o %TEMP%\\" + wallpaper.name + ".jpg " + wallpaper.url;
-        system(downloadCommand.c_str());
+        std::string imagePath = "%TEMP%\\" + wallpaper.name + ".jpg";
+        httplib::Client client("www.bing.com");
+        auto response = client.Get(wallpaper.url.c_str());
+        if (response && response->status == 200) {
+            FILE* file = fopen(imagePath.c_str(), "wb");
+            if (file) {
+                fwrite(response->body.c_str(), 1, response->body.size(), file);
+                fclose(file);
+            }
+            else {
+                std::cerr << "Error: Unable to open file for writing: " << imagePath << std::endl;
+            }
+        }
+        else {
+            std::cerr << "Error: Failed to download wallpaper. Code: " << (response ? response->status : -1) << std::endl;
+		}
     }
 
     void setWallpaper() const {

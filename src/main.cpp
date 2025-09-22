@@ -1,10 +1,11 @@
-#include "httplib.h"
+#include <httplib.h>
 #include <windows.h>
 #include <shellapi.h>
 #include <string>
 #include <thread>
 #include "defines.h"
 #include "bing.h"
+#include "resource.h"
 
 class TrayIcon {
 public:
@@ -16,7 +17,8 @@ public:
         notifyIconData_.uID = ID_TRAY_ICON;
         notifyIconData_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
         notifyIconData_.uCallbackMessage = WM_TRAYICON;
-        notifyIconData_.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        notifyIconData_.hIcon = LoadIcon(hInstance_, MAKEINTRESOURCE(IDI_ICON1));
+
         lstrcpy(notifyIconData_.szTip, tooltip.c_str());
 
         Shell_NotifyIcon(NIM_ADD, &notifyIconData_);

@@ -3,9 +3,15 @@
   <ItemGroup>
     <ClInclude Include="bing.h" />
     <ClInclude Include="defines.h" />
-    <ClInclude Include="httplib.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EverydayWallpaper.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\tray_image.ico" />
   </ItemGroup>
 </Project>
